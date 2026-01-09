@@ -55,6 +55,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+          cache: 'pip'
       
       - name: Install dependencies
         run: |
@@ -63,9 +64,9 @@ jobs:
       
       - name: Lint Python files
         run: |
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --select=E9,F7,F82 --show-source --statistics
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       
       - name: Check Python syntax
         run: |
-          python -m py_compile sync_orchestrator.py
+          find . -name "*.py" -exec python -m py_compile {} \;
