@@ -1,0 +1,27 @@
+FROM nvidia/cuda:12.3.1-devel-ubuntu22.04
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    build-essential \
+    cmake \
+    curl \
+    libcurl4-openssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Clone and build llama.cpp with CUDA support
+# Using -j4 to limit memory usage and prevent swap thrashing
+WORKDIR /build
+RUN git clone https://github.com/ggerganov/llama.cpp.git && \
+    cd llama.cpp && \
+    cmake -B build -DGGML_CUDA=ON && \
+    cmake --build build --config Release -j4
+
+# Create runtime directory
+WORKDIR /app
+RUN cp /build/llama.cpp/build/bin/llama-server /app/ && \
+    chmod +x /app/llama-server
+
+EXPOSE 8080
+
+ENTRYPOINT ["/app/llama-server"]
