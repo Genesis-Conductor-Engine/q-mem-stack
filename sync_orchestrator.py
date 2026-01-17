@@ -13,6 +13,14 @@ from datetime import datetime
 import redis
 import requests
 
+try:
+    import pynvml
+    NVML_AVAILABLE = True
+except ImportError:
+    NVML_AVAILABLE = False
+
+NVML_READY = False
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(message)s',
@@ -55,7 +63,28 @@ def check_redis_health(r):
 
 
 def get_gpu_stats():
-    """Get GPU stats via nvidia-smi (if available)"""
+    """Get GPU stats via pynvml (preferred) or nvidia-smi"""
+    if NVML_READY:
+        try:
+            handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+            util = pynvml.nvmlDeviceGetUtilizationRates(handle)
+            mem = pynvml.nvmlDeviceGetMemoryInfo(handle)
+            temp = pynvml.nvmlDeviceGetTemperature(handle, pynvml.NVML_TEMPERATURE_GPU)
+
+            # Convert bytes to MiB
+            used_mb = int(mem.used / 1024 / 1024)
+            total_mb = int(mem.total / 1024 / 1024)
+
+            return {
+                'gpu_util': f"{util.gpu}%",
+                'vram_used': f"{used_mb}MB",
+                'vram_total': f"{total_mb}MB",
+                'temp': f"{temp}C"
+            }
+        except Exception:
+            pass
+
+    # Fallback to subprocess
     try:
         import subprocess
         result = subprocess.run(
@@ -83,6 +112,15 @@ def main():
     
     # Wait for services to start
     time.sleep(10)
+
+    global NVML_READY
+    if NVML_AVAILABLE:
+        try:
+            pynvml.nvmlInit()
+            NVML_READY = True
+            logger.info("NVML initialized successfully")
+        except Exception as e:
+            logger.warning(f"Failed to initialize NVML: {e}")
     
     r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
     
