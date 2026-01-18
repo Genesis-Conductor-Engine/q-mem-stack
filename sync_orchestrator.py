@@ -12,6 +12,8 @@ from datetime import datetime
 
 import redis
 import requests
+import subprocess
+import subprocess
 
 logging.basicConfig(
     level=logging.INFO,
@@ -57,7 +59,6 @@ def check_redis_health(r):
 def get_gpu_stats():
     """Get GPU stats via nvidia-smi (if available)"""
     try:
-        import subprocess
         result = subprocess.run(
             ['nvidia-smi', '--query-gpu=utilization.gpu,memory.used,memory.total,temperature.gpu',
              '--format=csv,noheader,nounits'],
