@@ -13,13 +13,13 @@ The table below describes which releases currently receive security updates.
 
 If you believe you have found a security vulnerability in this project, please report it to us as quickly as possible using one of the following options:
 
-- **Email:** Send a detailed report to `security@example.com`.
-- **GitHub Security Advisories:** If this project is hosted on GitHub, you may alternatively open a private security advisory from the repository's **Security → Advisories** page.
+- **GitHub Security Advisories:** Open a private security advisory from the repository's **Security → Advisories** page. This is the preferred reporting method.
+- **Email:** Alternatively, send a detailed report to the project maintainers at Genesis-Conductor-Engine.
 
 When reporting a vulnerability, please include:
 
 - A description of the issue and the affected component(s)
-- Steps to reproduce, including any proof‑of‑concept code or configuration
+- Steps to reproduce, including any proof-of-concept code or configuration
 - The impact you believe the issue may have
 - Any relevant logs, screenshots, or environment details (OS, versions, etc.)
 
