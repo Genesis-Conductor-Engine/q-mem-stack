@@ -6,7 +6,7 @@ The table below describes which releases currently receive security updates.
 
 | Release type         | Supported          |
 | -------------------- | ------------------ |
-| Latest stable release| :white_check_mark: |
+| Latest stable release | :white_check_mark: |
 | Older releases       | :x:                |
 
 ## Reporting a Vulnerability
