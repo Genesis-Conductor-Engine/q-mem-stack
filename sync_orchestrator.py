@@ -12,8 +12,7 @@ from datetime import datetime
 
 import redis
 import requests
-import subprocess
-import subprocess
+import pynvml
 
 logging.basicConfig(
     level=logging.INFO,
@@ -57,21 +56,23 @@ def check_redis_health(r):
 
 
 def get_gpu_stats():
-    """Get GPU stats via nvidia-smi (if available)"""
+    """Get GPU stats via pynvml (if available)"""
     try:
-        result = subprocess.run(
-            ['nvidia-smi', '--query-gpu=utilization.gpu,memory.used,memory.total,temperature.gpu',
-             '--format=csv,noheader,nounits'],
-            capture_output=True, text=True, timeout=5
-        )
-        if result.returncode == 0:
-            parts = result.stdout.strip().split(', ')
+        pynvml.nvmlInit()
+        try:
+            handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+            util = pynvml.nvmlDeviceGetUtilizationRates(handle)
+            mem_info = pynvml.nvmlDeviceGetMemoryInfo(handle)
+            temp = pynvml.nvmlDeviceGetTemperature(handle, pynvml.NVML_TEMPERATURE_GPU)
+
             return {
-                'gpu_util': f"{parts[0]}%",
-                'vram_used': f"{parts[1]}MB",
-                'vram_total': f"{parts[2]}MB",
-                'temp': f"{parts[3]}C"
+                'gpu_util': f"{util.gpu}%",
+                'vram_used': f"{mem_info.used // 1024 // 1024}MB",
+                'vram_total': f"{mem_info.total // 1024 // 1024}MB",
+                'temp': f"{temp}C"
             }
+        finally:
+            pynvml.nvmlShutdown()
     except Exception:
         pass
     return None
