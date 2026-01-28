@@ -1,0 +1,5 @@
+chronoscribe/
+models/
+.git/
+__pycache__/
+*.pyc
