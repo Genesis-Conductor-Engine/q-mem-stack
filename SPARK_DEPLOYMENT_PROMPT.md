@@ -28,10 +28,10 @@ RUN git clone https://github.com/ggerganov/llama.cpp.git && \
     cd llama.cpp && \
     cmake -B build -DGGML_CUDA=ON && \
     cmake --build build --config Release -j4
-WORKDIR /app
-RUN cp /build/llama.cpp/build/bin/llama-server /app/ && chmod +x /app/llama-server
+WORKDIR /llama.cpp
+RUN cp /build/llama.cpp/build/bin/llama-server /llama.cpp/ && chmod +x /llama.cpp/llama-server
 EXPOSE 8080
-ENTRYPOINT ["/app/llama-server"]
+ENTRYPOINT ["/llama.cpp/llama-server"]
 ```
 
 **Runtime Configuration:**
@@ -89,7 +89,7 @@ import redis, requests
 
 # Environment Configuration
 LLM_HOST = os.getenv('LLM_HOST', 'localhost')
-LLM_PORT = int(os.getenv('LLM_PORT', 8080))
+LLM_PORT = int(os.getenv('LLM_PORT', 8082))
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
 CHECK_INTERVAL = 30  # seconds
