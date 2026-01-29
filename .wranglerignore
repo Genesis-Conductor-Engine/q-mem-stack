@@ -1,0 +1,9 @@
+*.py
+*.pyc
+__pycache__/
+*.sh
+Dockerfile*
+docker-compose.yml
+models/
+LICENSE
+README.md
