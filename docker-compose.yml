@@ -55,5 +55,21 @@ services:
       - REDIS_PORT=6379
     restart: unless-stopped
 
+  genesis-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: genesis-gateway
+    ports:
+      - "5000:5000"
+    depends_on:
+      - q-mem-cache
+    environment:
+      - REDIS_HOST=q-mem-cache
+      - REDIS_PORT=6379
+      - PORT=5000
+    command: ["python", "-u", "agent_gateway.py"]
+    restart: unless-stopped
+
 volumes:
   redis-data:
