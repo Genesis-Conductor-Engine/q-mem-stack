@@ -13,7 +13,6 @@ from datetime import datetime
 import redis
 import requests
 import subprocess
-import subprocess
 
 logging.basicConfig(
     level=logging.INFO,
