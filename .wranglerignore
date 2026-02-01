@@ -1,0 +1,18 @@
+# Ignore Python/System files
+*.py
+*.pyc
+__pycache__/
+models/
+venv/
+.env
+
+# Ignore Docker files
+Dockerfile*
+docker-compose.yml
+
+# Ignore Git
+.git/
+.gitignore
+
+# Ignore Scripts
+*.sh
