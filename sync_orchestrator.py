@@ -12,8 +12,11 @@ from datetime import datetime
 
 import redis
 import requests
-import subprocess
-import subprocess
+
+try:
+    import pynvml
+except ImportError:
+    pynvml = None
 
 logging.basicConfig(
     level=logging.INFO,
@@ -28,6 +31,21 @@ REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
 
 CHECK_INTERVAL = 30  # seconds
+
+NVML_AVAILABLE = False
+
+def init_nvml():
+    """Initialize NVML library"""
+    global NVML_AVAILABLE
+    if pynvml:
+        try:
+            pynvml.nvmlInit()
+            NVML_AVAILABLE = True
+            logger.info("NVML initialized successfully")
+        except pynvml.NVMLError as e:
+            logger.warning(f"Failed to initialize NVML: {e}")
+    else:
+        logger.warning("pynvml module not found, GPU stats disabled")
 
 
 def check_llm_health():
@@ -57,24 +75,24 @@ def check_redis_health(r):
 
 
 def get_gpu_stats():
-    """Get GPU stats via nvidia-smi (if available)"""
+    """Get GPU stats via pynvml (if available)"""
+    if not NVML_AVAILABLE:
+        return None
+
     try:
-        result = subprocess.run(
-            ['nvidia-smi', '--query-gpu=utilization.gpu,memory.used,memory.total,temperature.gpu',
-             '--format=csv,noheader,nounits'],
-            capture_output=True, text=True, timeout=5
-        )
-        if result.returncode == 0:
-            parts = result.stdout.strip().split(', ')
-            return {
-                'gpu_util': f"{parts[0]}%",
-                'vram_used': f"{parts[1]}MB",
-                'vram_total': f"{parts[2]}MB",
-                'temp': f"{parts[3]}C"
-            }
+        handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+        util = pynvml.nvmlDeviceGetUtilizationRates(handle)
+        mem = pynvml.nvmlDeviceGetMemoryInfo(handle)
+        temp = pynvml.nvmlDeviceGetTemperature(handle, pynvml.NVML_TEMPERATURE_GPU)
+
+        return {
+            'gpu_util': f"{util.gpu}%",
+            'vram_used': f"{mem.used // 1024 // 1024}MB",
+            'vram_total': f"{mem.total // 1024 // 1024}MB",
+            'temp': f"{temp}C"
+        }
     except Exception:
-        pass
-    return None
+        return None
 
 
 def main():
@@ -82,6 +100,9 @@ def main():
     logger.info(f"LLM Server: {LLM_HOST}:{LLM_PORT}")
     logger.info(f"Redis Cache: {REDIS_HOST}:{REDIS_PORT}")
     
+    # Initialize NVML
+    init_nvml()
+
     # Wait for services to start
     time.sleep(10)
     
