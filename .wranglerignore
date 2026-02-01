@@ -1,0 +1,12 @@
+*.py
+models/
+chronoscribe/
+Dockerfile
+Dockerfile.*
+.git/
+.github/
+.vscode/
+.devcontainer/
+tests/
+__pycache__/
+*.pyc
