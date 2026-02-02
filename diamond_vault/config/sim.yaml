@@ -1,0 +1,15 @@
+simulation:
+  name: "diamond-vault-local"
+  energy_budget_j: 0.042
+  tick_ms: 250
+  thread_allocation:
+    default_threads: 8
+    gpu_tpu_split: "30:70"
+  eigen_map:
+    baseline_dimensions: 7
+    shape_complexity: 0.42
+  integrity:
+    target_min: 0.95
+  thermal:
+    noise_interference: "stable"
+    delta_variance: 0.0042
