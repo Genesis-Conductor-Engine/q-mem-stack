@@ -43,7 +43,6 @@ def check_llm_health():
 def check_redis_health(r):
     """Check Redis health and return memory info"""
     try:
-        r.ping()
         info = r.info('memory')
         return {
             'healthy': True,
