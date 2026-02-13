@@ -1,0 +1,9 @@
+*.py
+*.pyc
+__pycache__/
+test_sync_orchestrator.py
+models/
+chronoscribe/
+Dockerfile
+docker-compose.yml
+*.sh
