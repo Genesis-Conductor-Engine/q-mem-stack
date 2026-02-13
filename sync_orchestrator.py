@@ -13,7 +13,10 @@ from datetime import datetime
 import redis
 import requests
 import subprocess
-import subprocess
+try:
+    import pynvml
+except ImportError:
+    pynvml = None
 
 logging.basicConfig(
     level=logging.INFO,
@@ -57,7 +60,25 @@ def check_redis_health(r):
 
 
 def get_gpu_stats():
-    """Get GPU stats via nvidia-smi (if available)"""
+    """Get GPU stats via pynvml (preferred) or nvidia-smi (fallback)"""
+    if pynvml:
+        try:
+            pynvml.nvmlInit()
+            handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+            util = pynvml.nvmlDeviceGetUtilizationRates(handle)
+            mem = pynvml.nvmlDeviceGetMemoryInfo(handle)
+            temp = pynvml.nvmlDeviceGetTemperature(handle, pynvml.NVML_TEMPERATURE_GPU)
+            pynvml.nvmlShutdown()
+
+            return {
+                'gpu_util': f"{util.gpu}%",
+                'vram_used': f"{mem.used // 1024 // 1024}MB",
+                'vram_total': f"{mem.total // 1024 // 1024}MB",
+                'temp': f"{temp}C"
+            }
+        except Exception:
+            pass
+
     try:
         result = subprocess.run(
             ['nvidia-smi', '--query-gpu=utilization.gpu,memory.used,memory.total,temperature.gpu',

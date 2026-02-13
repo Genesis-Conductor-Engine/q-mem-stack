@@ -1,1 +1,4 @@
 models/*.gguf
+
+__pycache__/
+*.pyc
