@@ -1,0 +1,13 @@
+.git/
+.github/
+.devcontainer/
+Dockerfile
+Dockerfile.llama-cuda
+*.sh
+*.py
+*.pyc
+__pycache__/
+q-mcp/
+tests/
+models/
+docker-compose.yml
