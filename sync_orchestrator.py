@@ -30,10 +30,13 @@ REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
 CHECK_INTERVAL = 30  # seconds
 
 
-def check_llm_health():
+def check_llm_health(session=None):
     """Check LLM server health"""
     try:
-        resp = requests.get(f'http://{LLM_HOST}:{LLM_PORT}/health', timeout=5)
+        if session:
+            resp = session.get(f'http://{LLM_HOST}:{LLM_PORT}/health', timeout=5)
+        else:
+            resp = requests.get(f'http://{LLM_HOST}:{LLM_PORT}/health', timeout=5)
         return resp.status_code == 200
     except Exception as e:
         logger.error(f"LLM health check failed: {e}")
@@ -86,11 +89,12 @@ def main():
     time.sleep(10)
     
     r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+    session = requests.Session()
     
     while True:
         status = {
             'timestamp': datetime.now().isoformat(),
-            'llm': {'healthy': check_llm_health()},
+            'llm': {'healthy': check_llm_health(session)},
             'redis': check_redis_health(r),
             'gpu': get_gpu_stats()
         }
