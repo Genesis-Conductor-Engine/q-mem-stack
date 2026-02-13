@@ -43,13 +43,18 @@ def check_llm_health():
 def check_redis_health(r):
     """Check Redis health and return memory info"""
     try:
-        r.ping()
-        info = r.info('memory')
+        pipe = r.pipeline()
+        pipe.ping()
+        pipe.info('memory')
+        pipe.dbsize()
+        results = pipe.execute()
+
+        info = results[1]
         return {
             'healthy': True,
             'used_memory': info.get('used_memory_human', 'unknown'),
             'maxmemory': info.get('maxmemory_human', 'unknown'),
-            'keys': r.dbsize()
+            'keys': results[2]
         }
     except Exception as e:
         logger.error(f"Redis health check failed: {e}")
