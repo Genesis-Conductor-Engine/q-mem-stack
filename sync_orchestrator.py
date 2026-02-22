@@ -13,7 +13,6 @@ from datetime import datetime
 import redis
 import requests
 import subprocess
-import subprocess
 
 logging.basicConfig(
     level=logging.INFO,
@@ -29,11 +28,14 @@ REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
 
 CHECK_INTERVAL = 30  # seconds
 
+# Use a session for connection pooling
+llm_session = requests.Session()
+
 
 def check_llm_health():
     """Check LLM server health"""
     try:
-        resp = requests.get(f'http://{LLM_HOST}:{LLM_PORT}/health', timeout=5)
+        resp = llm_session.get(f'http://{LLM_HOST}:{LLM_PORT}/health', timeout=5)
         return resp.status_code == 200
     except Exception as e:
         logger.error(f"LLM health check failed: {e}")
