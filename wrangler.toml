@@ -1,0 +1,7 @@
+name = "q-mem-stack"
+main = "worker.js"
+compatibility_date = "2023-10-30"
+
+[ignore]
+# Ignore the Python backend and other non-worker files
+sources = ["chronoscribe/", "models/", ".git/"]
