@@ -1,0 +1,21 @@
+version: "3"
+
+vars:
+  ORCH_ARGS: "{{.ORCH_ARGS}}"
+
+
+tasks:
+  orchestrate:
+    desc: "Run GitHub orchestration"
+    cmds:
+      - ./scripts/orchestrate_swarm.sh {{.ORCH_ARGS}}
+
+  simulate:
+    desc: "Run Diamond Vault local simulation"
+    cmds:
+      - ./scripts/run_diamond_vault_sim.sh
+
+  sdk:
+    desc: "Install the Python SDK in editable mode"
+    cmds:
+      - pip install -e ./sdk
