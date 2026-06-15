@@ -1,0 +1,16 @@
+{
+  "name": "q-mem-stack",
+  "version": "1.0.0",
+  "description": "Q-Mem Stack with React and React Native support",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-native": "^0.73.0"
+  }
+}
